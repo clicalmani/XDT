@@ -14,15 +14,15 @@ XDT comporte de nombreux méthodes pour créer ou pour modifier un contenu XML.
 
 ![](https://img.shields.io/badge/Git-Fork 0-green)
 
-###Prérequis
+### Prérequis
 Aucune dépendance
 
-###Installation
+### Installation
 Avec composer
 
 `$ composer require clicalmani/xpower`
 
-###Utilisation
+### Utilisation
 
 	<?php
 		/** Une chaîne avec une structure XML */
@@ -77,6 +77,6 @@ Avec composer
 	$xdt->connect('livres.xml', true, true);    // L'extension .xml peut être omise
 	?>
 
-###Documentation
+### Documentation
 
 > Voir doc
