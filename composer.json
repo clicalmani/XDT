@@ -1,5 +1,5 @@
 {
-    "name": "clicalmani/xdt",
+    "name": "clicalmani/xpower",
     "description": "XDT est un outil pour traverser un document XML avec de simple sélecteurs CSS. XDT prend en compte les sélecteurs CSS 2.0 et va au delà en adaptant les pseudo-sélecteurs de jQuery, comme: first, last, nth, eq.l",
     "type": "library",
     "require": {
