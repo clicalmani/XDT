@@ -93,8 +93,7 @@ class XDT {
 	function __construct($xml_dir = '.') {
 		
 		$this->document = new \DOMDocument('1.0', 'utf-8');
-		if ($xml_dir === '.') $this->xml_dir = dir($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'pdms_content' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'xml');
-		else $this->xml_dir = dir($xml_dir);
+		$this->xml_dir = dir($xml_dir);
 	}
 	
 	/**
