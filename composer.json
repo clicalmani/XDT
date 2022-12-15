@@ -8,7 +8,7 @@
     "license": "proprietary",
     "autoload": {
         "psr-4": {
-            "Clicalmani\\XDT\\": "src/"
+            "Clicalmani\\XPower\\": "/"
         }
     },
     "authors": [
