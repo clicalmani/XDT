@@ -6,7 +6,7 @@ C'est un petit package qui permet de gérer facilement les fichiers XML ou les c
 
 A l'instar de XPATH, XDT est un outil pour traverser un document XML avec de simple sélecteurs CSS. XDT prend en compte les sélecteurs CSS et va au delà en adaptant les pseudo-sélecteurs personnaliser, comme: first, last, nth, eq. 
 
-XDT comporte de nombreux méthodes pour créer ou pour modifier un contenu XML.
+XDT comporte de nombreuses méthodes pour créer ou pour modifier un contenu XML.
 
 # Editor.md
 
