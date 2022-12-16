@@ -43,7 +43,7 @@ Avec composer
 			</livres>
 	LIVRES;
 
-	$xdt = new XDT();					// Créer une instance de XDT
+	$xdt = new Clicalmani\XPower\XDT;					// Créer une instance de XDT
 	$xdt->load($chaine, true, true);    // Charger XML comme une chaîne
 
 	// Obtenir la racine du document XML
@@ -52,7 +52,7 @@ Avec composer
 
 	// Obtenir les informations concernant le premier livre publié
 	$obj = $xdt->select('livre[index="1"]');
-	print ($obj->children('titre')->val());          // Titre du livre: Kirikou 
+	print ($obj->children('titre')->val());          // Titre du livre: Kirikou ...
 	print ("<br>");
 	print ($obj->children('auteur')->val());         // Auteur du livre: Jean Pierre
 	print ("<br>");
