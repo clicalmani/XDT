@@ -8,7 +8,7 @@ A l'instar de XPATH, XDT est un outil pour traverser un document XML avec de sim
 
 XDT comporte de nombreuses méthodes pour créer ou pour modifier un contenu XML.
 
-# Editor.md
+# Xpower.md
 
 ![](https://upload.wikimedia.org/wikipedia/commons/9/9d/Xml_logo.svg)
 
