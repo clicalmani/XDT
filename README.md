@@ -10,10 +10,6 @@ XDT comporte de nombreuses méthodes pour créer ou pour modifier un contenu XML
 
 # Xpower.md
 
-![](https://upload.wikimedia.org/wikipedia/commons/9/9d/Xml_logo.svg)
-
-![](https://img.shields.io/badge/Git-Fork 0-green)
-
 ### Prérequis
 Aucune dépendance
 
