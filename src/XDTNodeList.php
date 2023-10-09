@@ -104,6 +104,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 		    
 		return null;
 	}
+
+	private function getNodeList () 
+	{ 
+		return $this->list; 
+	}
 	
 	/**
 	 * Remove the set of matched elements from the DOM.
@@ -1053,9 +1058,9 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Adds or removes one or more classes from each element in the set of matched elements, depending on eather the class's presence.
 	 * Enter description here ...
-	 * @param unknown_type $className
+	 * @param string $className
 	 */
-	function toggleClass($className) {
+	public function toggleClass(string $className) {
 		
 		foreach ($this as $node) {
 			$node = $this->toXDTObject($node);
@@ -1070,13 +1075,28 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	
 	public function toString() { return $this->values(); }
 	
-	public function getIterator() { return new XDTIterator($this); }
+	public function getIterator() : \Traversable
+	{ 
+		return new XDTIterator($this); 
+	}
 	
-	public function offsetExists ($index) { return is_null($this->item($index)) ? false: true; }
+	public function offsetExists ($index) : bool
+	{ 
+		return is_null($this->item($index)) ? false: true; 
+	}
 	
-	public function offsetGet ($index) { return $this->item($index); }
+	public function offsetGet (mixed $index) : mixed
+	{ 
+		return $this->item($index); 
+	}
 	
-	public function offsetSet ($index, $new_node) { return $this->replaceNodeByIndex($new_node, $index); }
+	public function offsetSet (mixed $index, mixed $new_node) : void
+	{ 
+		$this->replaceNodeByIndex($new_node, $index); 
+	}
 	
-	public function offsetUnset ($index) { return $this->removeFromList($index); }
+	public function offsetUnset (mixed $index) : void
+	{ 
+		$this->removeFromList($index); 
+	}
 }

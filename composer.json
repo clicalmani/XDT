@@ -8,13 +8,13 @@
     "license": "proprietary",
     "autoload": {
         "psr-4": {
-            "Clicalmani\\XPower\\": "/"
+            "Clicalmani\\XPower\\": "src/"
         }
     },
     "authors": [
         {
-            "name": "Abdoul-Madjid",
-            "email": "honorable85@gmail.com"
+            "name": "clicalmani",
+            "email": "clicalmani@gmail.com"
         }
     ],
     "minimum-stability": "dev",
