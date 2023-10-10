@@ -91,8 +91,11 @@ class XDT
 	 *     the file is search within the current directory.</p>
 	 * @return void
 	 */
-	public function __construct($xml_dir = '.') 
+	public function __construct() 
 	{
+		if ( !file_exists(database_path('xml')) ) {
+			mkdir( database_path('xml') );
+		}
 		
 		$this->document = new \DOMDocument('1.0', 'utf-8');
 		$this->xml_dir = dir(database_path('xml'));
@@ -572,7 +575,7 @@ class XDT
 	
 	private function getElementsByTagName (string $tag) : XDTNodeList
 	{
-		if ($this->query_result == null AND get_class($this->root) === 'DOMElement') $this->query_result = $this->root->getElementsByTagName('*');
+		if ($this->query_result == null AND $this->root instanceof \DOMElement) $this->query_result = $this->root->getElementsByTagName('*');
 		
 		if ($tag === '*') return $this->query_result;
 		
