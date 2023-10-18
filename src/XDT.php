@@ -584,7 +584,7 @@ class XDT
 		foreach ($this->query_result as $node) {
 			if (($node->nodeType === 3)) continue;
 			
-			if (strtolower($node->nodeName) === $tag) { 
+			if (strtolower($node->nodeName) === strtolower($tag)) { 
 				$list->add($node);
 			}
 		}
