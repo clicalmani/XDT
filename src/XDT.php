@@ -3,8 +3,6 @@
 namespace Clicalmani\XPower;
 
 use Clicalmani\XPower\XDTNodeList;
-use Clicalmani\XPower\XDTIterator;
-use Clicalmani\XPower\XDTNamedNodeMap;
 use \DOMElement as DOMElement;
 
 /**
@@ -77,7 +75,7 @@ class XDT
 	/**
 	 * A set of the current matched elements.
 	 * 
-	 * @var XDTNodeList
+	 * @var XDTNodeList|\DOMElement
 	 */
 	protected $query_result = null; 
 	
@@ -273,7 +271,7 @@ class XDT
 			/**
 			 * Cast query result to NodeList.
 			 */
-			if (is_object($this->query_result) AND get_class($this->query_result) === 'DOMElement') {
+			if (is_object($this->query_result) AND $this->query_result instanceof \DOMElement) {
 				$this->query_result = new XDTNodeList($this->query_result);
 			}
 			
@@ -311,7 +309,7 @@ class XDT
 			$this->query_result = $this->querySelector($chunks[$index]);
 		}
 		
-		if (is_object($this->query_result) AND get_class($this->query_result) === 'DOMElement') {
+		if (is_object($this->query_result) AND $this->query_result instanceof \DOMElement) {
 			$this->query_result = new XDTNodeList($this->query_result);
 		}
 		
@@ -597,9 +595,9 @@ class XDT
 	protected function processData(mixed $data) : mixed
 	{
 		if (is_string($data)) {
-			if (preg_match('/^</', $data)) {
+			if (preg_match('/^</', trim($data))) {
 				$this->document = $this[0]->ownerDocument;
-				return $this->createDocumentFragmentWithData($data);
+				return $this->createDocumentFragmentFromSelection($data);
 			} else {
 				$this->query_result = null; 
 				$this->root = $this[0]->ownerDocument->firstChild;
@@ -698,7 +696,7 @@ class XDT
 		return $this->query_result;
 	}
 	
-	private function createDocumentFragmentWithData($data) : mixed
+	private function createDocumentFragmentFromSelection($data) : mixed
 	{
 		$frag = $this->createDocumentFragment();
 		if ($frag->appendXML($data)) {

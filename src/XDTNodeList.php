@@ -15,14 +15,14 @@ use \DOMElement as DOMElement;
  * 
  * @tutorial Changes made by a method of this class are not automaticaly saved. Explicitly call the XDT close method to save change.
  * 
- * @author Abdoul-Madjid
- * @package XDT
+ * @author @clicalmani
+ * @package clicalmani/xpower
  * @version 2.3.0
  *
  */
-class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
-	
-	public $list = array(); 
+class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess 
+{
+	public $list = []; 
 	
 	/**
 	 * Holds the number of matched elements from the current operation<br><br> The property is 
@@ -36,18 +36,17 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Create a new instance of XDTNodeList.
 	 * 
-	 * @param mixed $element [optional] <p>
-	 *     DOM element or array of DOM elements can be provided to instanciate the object with.</p>
+	 * @param \DOMElement|array<DOMElement> $element
+	 *     DOM element or array of DOM elements can be provided to instanciate the object with.
 	 */
-	public function __construct($element = null) { 
-		
-	    if (isset($element)) {
-			
-			if (@get_class($element) === 'DOMElement') {
+	public function __construct(DOMElement|array $element = null) 
+	{
+	    if (NULL !== $element) {
+			if ($element instanceof DOMElement) {
 				$this->add($element);
 			} elseif (is_array($element)) {
 				foreach ($element as $node) {
-					if (is_object($node) AND get_class($node) === 'DOMElement') {
+					if (is_object($node) AND $node instanceof DOMElement) {
 						$this->add($node);
 					}
 				}
@@ -60,12 +59,12 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 
 	 * @param integer $index <p>
 	 *     Index of the element in the set of matched elements.</p>
-	 * @return DOMElement <p>
+	 * @return \DOMElement <p>
 	 * 		Returns a DOM element or throws an OutOfRangeException if the element was not found.</p>
-	 * @throws OutOfRangeException
+	 * @throws \Clicalmani\XPower\Exceptions\OutOfRangeException
 	 */
-	public function item($index) {
-		
+	public function item(int $index) 
+	{
 		if ($index > ($this->length-1) OR $index < 0) throw new OutOfRangeException('Undefined offset: ' . $index);
 		
 		return $this->list[$index];
@@ -74,13 +73,13 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
     /**
      * Add a DOM element to the current set of matched elements.
      * 
-     * @param DOMElement $node <p>
+     * @param \DOMElement $node <p>
      *     DOM element to add to the set.</p>
-     * @return Boolean <p>
+     * @return bool <p>
      *     Returns TRUE on success, or FALSE on error or failure.</p>
      */
-	public function add (DOMElement $node) {
-	     
+	public function add (\DOMElement $node) : bool
+	{ 
 	    if (array_push($this->list, $node)) {
 			$this->length++;
 			return true;
@@ -90,13 +89,17 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Merge the provided set of elements into the matched set of elements.
 	 * 
-	 * @param XDTNodeList $list <p>
+	 * @param static $list <p>
 	 *     Set of elements to be merged into the current set.</p>
 	 */
-	public function merge (XDTNodeList $list) { $this->list = array_merge($this->list, $list->getNodeList()); $this->length += $list->length; }
+	public function merge (XDTNodeList $list) 
+	{ 
+		$this->list = array_merge($this->list, $list->getNodeList()); 
+		$this->length += $list->length; 
+	}
 	
-	private function removeFromList ($index) { 
-		
+	private function removeFromList (int $index) : mixed
+	{ 
 		if ($arr = array_splice($this->list, $index, 1)) {
 			$this->length--;
 			return $arr[0];
@@ -105,7 +108,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 		return null;
 	}
 
-	private function getNodeList () 
+	private function getNodeList () : array
 	{ 
 		return $this->list; 
 	}
@@ -113,24 +116,24 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Remove the set of matched elements from the DOM.
 	 * 
-	 * @return XDTNodeList <p>
-	 * 		Returns the set of matched elements that was removed.</p>
+	 * @return void
 	 */
-	public function remove () {
-		
+	public function remove () : void
+	{
 		foreach ($this as $node) 
 		    $node->parentNode->removeChild($node);
 	}
 	
 	/**
 	 * Removes attribute
-	 * @param attr string<p>
-	 * The name of the attribute </p>
-	 * @return XDTNodeList <p>
-	 * The set of matched elements</p>
+	 * 
+	 * @param string $attr
+	 * 	The name of the attribute 
+	 * @return static <p>
+	 * 	The set of matched elements</p>
 	 */
-	public function removeAttr($attr) {
-		
+	public function removeAttr(string $attr) : static
+	{
 		foreach ($this as $node) 
 			if ($node->hasAttribute($attr)) $node->removeAttribute($attr);
 			
@@ -140,18 +143,18 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Remove all child nodes of the set of matched elements from the DOM.
 	 * 
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the set of matched elements whose children were removed.</p>
 	 */
-	public function emptyNode() {
-		
+	public function emptyNode() : static
+	{
 		foreach ($this as $node) $node->nodeValue = '';
 		
 		return $this;
 	}
 	
-	private function replaceNodeByIndex (DOMElement $new_node, $index) { 
-	
+	private function replaceNodeByIndex (\DOMElement $new_node, int $index) : mixed
+	{
 	    if ($arr = array_splice($this->list, $index, 1, $new_node))
 	    	return $arr[0]->parentNode->replaceChild($new_node, $arr[0]);
 	    
@@ -162,15 +165,15 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Replace each element in the set of matched elements with the provided new content and 
 	 * return the set of elements that was removed.
 	 * 
-	 * @param mixed $content <p>
+	 * @param XDTNodeList|\DOMElement|string $content <p>
 	 *     The content to insert may be an XML string, DOM element, or XDTNodeList object. 
 	 *     When you pass a XDTNodeList collection containing more than one element, or a selector 
 	 *     matching more than one element, the first element will be used.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 	   Returns the set of elements that was removed.</p>
 	 */
-	public function replaceWith ($content) {
-		
+	public function replaceWith (XDTNodeList|\DOMElement|string $content) : static
+	{
 		if ($this->length === 0) return null;
 		
 		$content = $this->processData($content);
@@ -195,17 +198,17 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Insert the first element in the selection before the element passed in argument.
 	 * 
 	 * @see XDTNodeList::insertAfter
-	 * @param mixed $target <p>
+	 * @param XDTNodeList|\DOMElement|string $target <p>
 	 *     A selector, DOM element, XML string, or XDTNodeList object; the 
 	 *     matched set of elements will be inserted before the element specified by this parameter.
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 *     Returns the inserted elements on success, for chaining purpose, or &null on failure.</p>
 	 */
-	public function insertBefore ($target) { 
-		
+	public function insertBefore (XDTNodeList|\DOMElement|string $target) : static
+	{
 		if ($target = $this->processData($target)) 
 			foreach ($this as $node) 
-				if (get_class() === 'XDTNodeList') $target[0]->parentNode->insertBefore($node, $target[0]);
+				if ($target instanceof self) $target[0]->parentNode->insertBefore($node, $target[0]);
 				else $target->parentNode->insertBefore($node, $target);
 				
 		return $this;
@@ -215,16 +218,16 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Insert the first element in the selection after the element passed in argument.
 	 * 
 	 * @see XDTNodeList::insertBefore
-	 * @param mixed $target <p>
+	 * @param XDTNodeList|\DOMElement|string $target <p>
 	 *     A selector, DOM element, XML string, or XDTNodeList object; the 
 	 *     matched set of elements will be inserted after the element specified by this parameter. 
 	 *     When you pass a XDTNodeList collection containing more than one element, or a selector 
 	 *     matching more than one element, the first element will be used.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 *     Returns the inserted elements on success, for chaining purpose, or &null on failure.</p>
 	 */
-	public function insertAfter ($target) { 
-		
+	public function insertAfter (XDTNodeList|\DOMElement|string $target) : static
+	{
 		if ($target = $this->processData($target)) 
 			foreach ($this as $node) 
 				if (get_class($target) === 'XDTNodeList') $target[0]->parentNode->insertBefore($node, $target[0]->nextSibling);
@@ -238,24 +241,26 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * in the set of matched elements.
 	 * 
 	 * @see XDTNodeList::prepend
-	 * @param mixed $content <p>
+	 * @param mixed ...$args <p>
 	 *     DOM element, text node, array of elements and text nodes, XML string, or XDTNodeList object 
 	 * 	   to insert at the end of each element in the set of matched elements. You can provide any number of contents
 	 *     by separating them by a comma (,).</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 	   Returns the set of inserted elements on success, for chaining purpose, or &null on failure.</p>
 	 */
-	public function append ($data) {
-		
+	public function append (mixed ...$args) : static
+	{
 		if ($this->length < 1) return null;
 		
-		$args = func_get_args();
-		foreach ($args as $offset => $data) 
-			if ($data = $this->processData($data)) 
-				foreach ($this as $node) 
-					if (get_class($data) === 'XDTNodeList') {
+		foreach ($args as $offset => $data) {
+			if ($data = $this->processData($data)) {
+				foreach ($this as $node) {
+					if ($data instanceof self) {
 						if ($data->length) $node->appendChild($data[0]);
 					} else $node->appendChild($data);
+				}
+			}
+		}
 				
 		return $this;
 	}
@@ -265,18 +270,17 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * in the set of matched elements.
 	 * 
 	 * @see XDTNodeList::append
-	 * @param mixed $content,...<p>
+	 * @param mixed ...$args<p>
 	 * 		DOM element, text node, array of elements and text nodes, XML string, or XDTNodeList object 
 	 * 		to insert at the begining of each element in the set of matched elements. You can provide any 
 	 *      number of content by separating them by a comma (,).</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 *     Returns the set of inserted elements on success, for chaining purpose, or &null on failure.</p>
 	 */
-	public function prepend ($content) {
-		
+	public function prepend (mixed ...$args) : static
+	{
 		if ($this->length < 1) return null;
 		
-		$args = func_get_args();
 		foreach ($args as $offset => $value) 
 			if ($value = $this->processData($value)) 
 				foreach ($this as $node) 
@@ -290,17 +294,17 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Insert every element in the set of matched elements to the end of the target.
 	 * 
 	 * @see XDTNodeList::preprendTo
-	 * @param mixed $target <p>
+	 * @param XDTNodeList|\DOMElement|string|array $target <p>
 	 *     A selector, element, XML string, array of elements, or XDTNodeList object; the 
 	 *     matched set of elements will be inserted at the end of the element(s) specified by this parameter.
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 	   Returns the set of inserted elements, for chaining purpose, on success or &null on failure.</p>
 	 */
-	public function appendTo ($target) { 
-		
+	public function appendTo (XDTNodeList|\DOMElement|string|array $target) : static
+	{
 		if ($target = $this->processData($target))
 			foreach ($this as $node) 
-				if (get_class($target) === 'XDTNodeList' OR is_array($target)) 
+				if ($target instanceof self OR is_array($target)) 
 					foreach ($target as $t) $t->appendChild($node);
 				else $target->appendChild($node);
 				
@@ -311,14 +315,14 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Insert every element in the set of matched elements to the begining of the target.
 	 * 
 	 * @see XDTNodeList::appendTo
-	 * @param mixed $target <p>
+	 * @param XDTNodeList|\DOMElement|string|array $target <p>
 	 *     A selector, element, XML string, array of elements, or XDTNodeList object; the 
 	 *     matched set of elements will be inserted at the begining of the element(s) specified by this parameter.
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 *     Returns the set of inserted elements, for chaining purpose, on success or &null on failure.</p>
 	 */
-	public function prependTo ($target) { 
-		
+	public function prependTo (XDTNodeList|\DOMElement|string|array $target) : static
+	{
 		if ($target = $this->processData($target))
 			foreach ($this as $node) 
 				if (get_class($target) === 'XDTNodeList' OR is_array($target)) 
@@ -335,14 +339,14 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 *     A selector, element, XML string, or XDTNodeList object specifying the structure 
 	 *     to wrap around the matched elements. When you pass a XDTNodeList collection containing 
 	 *     more than one element, or a selector matching more than one element, the first element will be used.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the set of matched elements for chaining purpose.</p>
 	 */
-	public function wrap ($selector) {
-		
+	public function wrap(XDTNodeList|\DOMElement|string $selector) : static
+	{
 		if ($selector = $this->processData($selector))
 			foreach ($this as $node) {
-				if (get_class($selector) === 'XDTNodeList') {
+				if ($selector instanceof self) {
 					$n = $node->parentNode->insertBefore($selector[0], $node);
 					$n->appendChild($node);
 				} else {
@@ -357,9 +361,12 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Get the text content of the first matched element.
 	 * 
-	 * @return string
+	 * @return mixed The text content of the matched element or NULL.
 	 */
-	public function text () { return $this[0]->textContent; }
+	public function text() : mixed 
+	{ 
+		return $this[0]?->textContent; 
+	}
 	
 	/**
 	 * Get the children of each element in the set of matched elements, 
@@ -367,14 +374,14 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 
 	 * @param string $selector [optional] <p>
 	 * 		A string containing the selector expression to match against.</p>
-	 * @return XDTNodeList
+	 * @return static
 	 */
-	public function children ($selector = null) { 
-		
+	public function children(?string $selector = null) : static
+	{
 		$l = new XDTNodeList();
-			foreach ($this as $node) 
-				foreach ($node->childNodes as $child) 
-					if ($child instanceof DOMElement) $l->add($child);
+		foreach ($this as $node) 
+			foreach ($node->childNodes as $child) 
+				if ($child instanceof \DOMElement) $l->add($child);
 		
 		if (!isset($selector)) return $l;
 		
@@ -387,17 +394,18 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * or optionally verify whether the given element that match the selector is a child 
 	 * of any element in the set of matched elements.
 	 * 
-	 * @param mixed $selector [optional] <p>
+	 * @param \DOMElement|string|null $selector <p>
 	 *     A string containing the selector expression or a DOMElement.
-	 * @return boolean <p>
+	 * @return bool <p>
 	 *     Returns TRUE on success, or FALSE on error or failure.
 	 */
-	public function hasChildren ($selector = null) {
+	public function hasChildren(\DOMElement|string|null $selector = null) : bool
+	{
 		$ret = $this->children();
 		
 		if (!isset($selector)) return $this->children()->length? true: false;
 		
-		if (is_object($selector) AND get_class($selector) === 'DOMElement') {
+		if (is_object($selector) AND $selector instanceof \DOMElement) {
 			
 			foreach ($this as $node) {
 					
@@ -426,13 +434,13 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * filtered by a selector.
 	 * 
 	 * @see XDTNodeList::parent
-	 * @param string $selector [optional] <p>
+	 * @param ?string $selector <p>
 	 *     A string containing the selector expression.</p>
-	 * @return XDTNodeList
+	 * @return static
 	 */
-	public function parents ($selector = null) { 
-		
-		$list = new XDTNodeList();
+	public function parents(?string $selector = NULL) : static
+	{
+		$list = new self;
 		
 		foreach ($this as $node) 
 			while (!$node->isSameNode($node->ownerDocument)) {
@@ -443,7 +451,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 				$list->add($node);
 			}
 			
-		if (!isset($selector)) return $list;
+		if (NULL === $selector) return $list;
 		
 		$this->query_result = $list;
 		return $this->select($selector, null, XDT_SELECT_FILTER);
@@ -452,17 +460,17 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Get the parent of each element in the current set of matched elements, optionally filtered by a selector.
 	 * 
-	 * @param string $selector [optional] <p>
+	 * @param ?string $selector <p>
 	 * 		A string containing the selector expression.</p>
-	 * @return XDTNodeList
+	 * @return static
 	 */
-	public function parent($selector = null) { 
-		
+	public function parent(?string $selector = NULL) : static
+	{
 		$list = new XDTNodeList();
 		
 		foreach ($this as $node) $list->add($node->parentNode);
 		
-		if (!isset($selector)) return $list;
+		if (NULL === $selector) return $list;
 		
 		$this->query_result = $list;
 		return $this->select($selector, null, XDT_SELECT_FILTER);
@@ -471,16 +479,16 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Get the descendences of each element in the current set of matched elements, filtered by a selector
 	 * 
-	 * @param string $selector [optional] <p>
+	 * @param ?string $selector <p>
 	 *     A string containing the selector expression.
 	 *     If omitted the current set of matched elements is returned.</p>
-	 * @return XDTNodeList  
+	 * @return static  
 	 */
-	public function find ($selector = null) {
-		
+	public function find (?string $selector = NULL) : static
+	{
 		if (!isset($selector) OR $this->length === 0) return $this;
 		
-		$l = new XDTNodeList();
+		$l = new self;
 		
 		foreach ($this as $node) {
 			
@@ -493,13 +501,13 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Reduce the set of matched elements to those that match the selector
 	 * 
-	 * @param string $selector [optional] <p>
+	 * @param ?string $selector <p>
 	 *     A string containing the selector expression.
 	 *     If omitted the current set of matched elements is returned.</p>
-	 * @return XDTNodeList
+	 * @return static
 	 */
-	public function filter ($selector = null) {
-		
+	public function filter(?string $selector = NULL) : static
+	{
 		if (!isset($selector) OR $this->length === 0) return $this;
 		
 		$this->query_result = $this;
@@ -512,11 +520,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * @see XDTNodeList::hasAttr
 	 * @param string $attr <p>
 	 * 		A string representing the attribute to search for.
-	 * @return boolean <p>
+	 * @return bool <p>
 	 * 		Returns boolean true on success, or false on failure.</p>
 	 */
-	public function hasAttribute ($attr) {
-		
+	public function hasAttribute(string $attr) : bool
+	{
 		foreach ($this as $node) 
 			if (!$node->attributes->getNamedItem($attr)) return false;
 		
@@ -529,10 +537,10 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * @see XDTNodeList::hasAttribute
 	 * @param string $attr <p>
 	 * 		A string representing the attribute to search for.
-	 * @return boolean <p>
+	 * @return bool <p>
 	 * 		Returns boolean true on success, or false on failure.</p>
 	 */
-	public function hasAttr ($attr) { return $this->hasAttribute($attr); }
+	public function hasAttr(string $attr) : bool { return $this->hasAttribute($attr); }
 	
 	/**
 	 * Verify whether any of the matched elements are assigned the given class; 
@@ -541,11 +549,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 
 	 * @param string $class <p>
 	 * 		The class name to search for.
-	 * @return boolean <p>
+	 * @return bool <p>
 	 * 		Returns boolean true on success, or false on failure.</p>
 	 */
-	public function hasClass($class) {
-		
+	public function hasClass(string $class) : bool
+	{
 		foreach ($this as $node) {
 			$node = $this->toXDTObject($node);
 			if ($node->hasAttr('class') === false) return false;
@@ -564,32 +572,30 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Get attributes for the first matched element or set one or more attributes for every matched element.
 	 * 
 	 * @see XDTNodeList::attr
-	 * @param array $data [optional] <br><br>
+	 * @param array $data <br><br>
 	 *     When set it contains attributes representing the key and value pairs of the array. 
 	 *     If omitted the first matched element attributes are returned as a DOMNamedNodeMap object.
 	 * @return object with the selected matched element attributes as properties otherwise the current selection matched elements.
 	 */
-	public function data ($data = null) {
-		
+	public function data(?array $data = null) : object
+	{
 		if (!isset($data)) {
 			
 			$data = $this[0]->attributes;
 			$obj = new XDTDOMNamedNodeMap($data);
 			
 			for ($i=0; $i<$data->length; $i++) {
-				
-				$obj->{$data->item($i)->name} = $data->item($i)->value;
+				$obj->{$data->item($i)->name} = $data->item($i)->nodeValue;
 			}
 			
 			return $obj;
 		}
 		
+		/** @var \DOMNode */
 		foreach ($this as $node) {
-				
 			foreach ($data as $name => $value) {
-				
 				$attrNode = $node->ownerDocument->createAttribute($name);
-				$attrNode->value = $value;
+				$attrNode->nodeValue = $value;
 				$node->appendChild($attrNode);
 			}
 		}
@@ -602,10 +608,10 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * set one or more attributes for every matched element.
 	 * 
 	 * @see XDTNodeList::data
-	 * @param mixed $name <p>
+	 * @param string|string[] $name <p>
 	 *     A string representing the attribute name which value is to be set or an array 
 	 *     of attributes which values are to be set.</p>
-	 * @param mixed $value [Optional] <p>
+	 * @param string|string[] $value [Optional] <p>
 	 *     A string representing the new value of the first matched element or an array of values 
 	 *     in the same order as the names array giving as the first argument to the method.</p>
 	 *     
@@ -614,26 +620,37 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 		The current value of the named attribute of the first matched element when 
 	 *      the method is used to get a value; otherwise the current selection matched elements.</p>
 	 */
-	public function attr ($name, $value = null) {
-		
-		if (!isset($value) AND is_string($name)) 
-		    return $this[0]->attributes->getNamedItem($name)->value;
+	public function attr(string|array $name, string|array $value = null) : mixed
+	{
+		if (!isset($value) AND is_string($name)) {
+			/** @var \DOMNode */
+			$node = $this[0];
+
+			if ($n = $node->attributes->getNamedItem($name)) return $n->nodeValue;
+			
+			throw new \Exception(
+				sprintf("Attribute %s not found on node %s, in %s at %d", $name, $node->nodeName, __FILE__, __LINE__)
+			);
+		}  
 		    
 		if ((is_array($value) AND is_array($name)) AND (count($value) === count($name))) {
-				
-			foreach ($this as $node) 
+			
+			/** @var \DOMNode */
+			foreach ($this as $node) {
 				foreach ($name as $i => $attr) {
 					
 					$attrNode = $node->ownerDocument->createAttribute($attr);
-					$attrNode->value = (string)$value[$i];
+					$attrNode->nodeValue = (string)$value[$i];
 					$node->appendChild($attrNode);
 				}
+			}
+				
 		} else {
 			
 			foreach ($this as $node) {
 				
 				$attrNode = $node->ownerDocument->createAttribute($name);
-				$attrNode->value = (string)$value;
+				$attrNode->nodeValue = (string)$value;
 				$node->appendChild($attrNode);
 			}
 		}
@@ -641,28 +658,19 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 		return $this;
 	}
 	
-	private function getListElementIndex (DOMElement $node) {
-		
-		foreach ($this->list as $index => $elt) {
-			if ($node->isSameNode($elt)) return $index;
-		}
-		
-		return -1;
-	}
-	
 	/**
 	 * Get the matched element index from among its siblings, or get a giving DOM element's 
 	 * index from the set of matched elements, or get a filtered element's index from among 
 	 * the set of matched elements
 	 * 
-	 * @param mixed $selector [optional] <p>
+	 * @param \DOMElement|string|null $selector <p>
 	 *     A string representing a selector expression to filter the set of matched elements against, 
 	 *     or a DOMElement representing the element which index is search for.
-	 * @return integer <p>
+	 * @return int <p>
 	 *     Returns the matched element's index on success, or -1 on failure.
 	 */
-	public function index ($selector = null) {
-		
+	public function index (\DOMElement|string|null $selector = null) : int
+	{
 		if (!isset($selector)) {
 			
 			foreach ($this[0]->parentNode->childNodes as $index => $child) {
@@ -684,32 +692,39 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 			}
 		}
 		
-		
 		return -1;
 	}
 	
 	/**
+	 * Gets element by index in the set of matched elements.
+	 * 
+	 * @param int $index Element index
+	 * 
 	 * @see XDTNodeList::get
 	 * @see XDTNodeList::item
+	 * 
+	 * @return static
 	 */
-	public function pos($index) { return new XDTNodeList($this[$index]); }
+	public function pos(int $index) : static { return new self($this[$index]); }
 	
-	public function isEmpty() { return $this->children()->length? false: true; }
+	/**
+	 * Verify whether the selection is empty.
+	 * 
+	 * @return bool
+	 */
+	public function isEmpty() : bool { return $this->children()->length? false: true; }
 	
 	/**
 	 * Iterate over the set of matched elements executing a function for each matched element
 	 * 
 	 * @see XDTNodeList::map
-	 * @param string $func_name <p>
+	 * @param callable $callback <p>
 	 *     A function to execute for each matched element.</p>
-	 * @return 
-	 *     Returns null on failure.
+	 * @return void
 	 */
-	public function each ($func_name) { 
-		
-		if (!function_exists($func_name)) return null;
-		
-		foreach ($this as $index => $node) $$func_name($index, $node); 
+	public function each(callable $callback) : void
+	{
+		foreach ($this as $index => $node) $callback($index, $node); 
 	}
 	
 	/**
@@ -718,30 +733,28 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * <b>Notice:</b> This method alter directly the loaded xml file; an explicit call 
 	 * to the XDT::close method must follow the call of the method.
 	 * @see XDTNodeList::each
-	 * @param string $func_name <p>
+	 * @param callable $callback <p>
 	 * 		A function to process each item against. The first argument to the function is the element 
 	 * 		index and the second argument is a DOMElement object. The returned value of the function is 
 	 * 		used as the current value of the element.</p>
 	 * @return
 	 *     Returns null on failure.
 	 */
-	public function map ($func_name) { 
-		
-		if (!function_exists($func_name)) return null;
-		
-		foreach ($this as $index => $node) $node->nodeValue = $func_name($index, $node); 
+	public function map(callable $callback) 
+	{
+		foreach ($this as $index => $node) $node->nodeValue = $callback($index, $node); 
 	}
 	
 	/**
 	 * Get the current value of the first element in the set of matched elements 
 	 * or optionally set the value of every matched element. <br><br>
-	 * @param string $value [optional] <p>
+	 * @param ?string $value <p>
 	 * 		A string representing the current value of the first matched element. Otherwise void.
-	 * @return string <p>
+	 * @return mixed <p>
 	 * 		A string representing the current value of the first element in the set of matched elements.</p>
 	 */
-	public function val ($value = null) {
-		
+	public function val(?string $value = null) : mixed
+	{
 		if (isset($value)) {
 			foreach ($this as $node) $node->nodeValue = $value;
 		} else return $this[0]->nodeValue;
@@ -753,7 +766,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * @return string <p>
 	 * 		A string representing the matched element's node name.</p>
 	 */
-	 public function name() { return $this[0]->nodeName; }
+	 public function name() : string { return $this[0]->nodeName; }
 	
 	/**
 	 * Return an array of the values of the set of matched elements.
@@ -761,8 +774,8 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 
 	 * @return array
 	 */
-	public function values () {
-		
+	public function values() : array
+	{
 		$values = array();
 		foreach ($this as $node) {
 			$values[] = $node->nodeValue;
@@ -774,29 +787,29 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Get the first element in the set of matched elements.
 	 * 
-	 * @return XDTNodeList
+	 * @return static
 	 */
-	public function first () { return new XDTNodeList($this[0]); }
+	public function first() : static { return new self($this[0]); }
 	
 	/**
 	 * Get the last element in the set of matched elements.
 	 * 
-	 * @return XDTNodeList
+	 * @return static
 	 */
-	public function last () { return new XDTNodeList($this[$this->length-1]); }
+	public function last() : static { return new XDTNodeList($this[$this->length-1]); }
 	
 	/**
 	 * Get the siblings of each element in the set of matched elements, optionally filtered by a selector.
 	 * 
 	 * @since Version 2.1
-	 * @param string $selector [optional] <p>
+	 * @param ?string $selector [optional] <p>
 	 * 		A string containing a selector expression to match against.</p>
 	 * 		<p>When omitted, the siblings of each element in the set of matched elements are returned.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the sibling of each element in the set of matched elements, optionally filtered by a selector.</p>
 	 */
-	public function siblings ($selector = null) { 
-		
+	public function siblings(?string $selector = null) : static
+	{
 		$list = new XDTNodeList();
 		
 		foreach ($this as $node) {
@@ -821,14 +834,14 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * If a selector is provided, it retrieves the next sibling only if it matches that selector.</p>
 	 * 
 	 * @since Version 2.1
-	 * @param string $selector [optional] <p>
+	 * @param ?string $selector [optional] <p>
 	 * 		A string containing a selector expression to match elements against.</p>
 	 * 		<p>If selector is omitted, all the next siblings of each element in the matched set are returned.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the matched set.</p>
 	 */
-	public function next ($selector = null) { 
-		
+	public function next(?string $selector = null) : static
+	{
 		$list = new XDTNodeList();
 		
 		foreach ($this as $node) {
@@ -856,11 +869,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * @param string $selector [optional] <p>
 	 * 		A string containing a selector expression to match elements against.</p>
 	 * 		<p>If selector is omitted, all the previous siblings of each element in the matched set are returned.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the matched set.</p>
 	 */
-	public function prev ($selector = null) {
-		
+	public function prev(?string $selector = null) : static
+	{
 		$list = new XDTNodeList();
 		
 		foreach ($this as $node) {
@@ -883,25 +896,25 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Select the element at index n within the matched set.
 	 * 
 	 * @see XDTNodeList::eq
-	 * @param integer $index <p>
+	 * @param int $index <p>
 	 *     Zero-base index at which to select the element.</p>
-	 * @return DOMElement <p>
+	 * @return \DOMElement|null <p>
 	 * 		Returns the selected element object.</p>
 	 */
-	public function get ($index) { return $this[$index]; }
+	public function get(int $index) : \DOMElement { return @$this[$index]; }
 	
 	/**
 	 * Select the element at index n within the matched set.
 	 * 
 	 * @see XDTNodeList::get
 	 * @since Version 2.3
-	 * @param integer $index <p>
+	 * @param int $index <p>
 	 * 		Zero-based index at which to select the element.</p>
 	 * 		<p>If negative index is given, the counting starts from the end of the matched set.</p>
-	 * @return DOMElement <p>
+	 * @return \DOMElement|null <p>
 	 * 		Returns the selected element object, otherwise null on failure.</p>
 	 */
-	public function eq ($index) { 
+	public function eq(int $index) { 
 		
 		if ($index >= 0) return $this->get($index); 
 		elseif ($this->length+$index-1>=0) return $this->get($this->length+$index-1);
@@ -914,11 +927,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 
 	 * @param string $selector <p>
 	 * 		A string containing a selector expression to match against.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the set of matched elements.</p>
 	 */
-	public function nth ($selector) { 
-		
+	public function nth(string $selector) : static
+	{
 		$this->query_result = $this;
 		return $this->select($this->name() . ':nth(' . $selector . ')', null, XDT_SELECT_FILTER);
 	}
@@ -926,15 +939,15 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	/**
 	 * Remove elements from the set of matched elements.
 	 * 
-	 * @param mixed $selector [optional] <p>
+	 * @param \DOMElement|array|string|null $selector <p>
 	 * 		A string containing a selector expression, a DOM element, or an array
 	 * 		of elements to match against the set.</p>
 	 * 		<p>If selector is omitted, the filtering operation is canceled and the previous set of matched elements is returned.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the filtered elements.</p>
 	 */
-	public function not($selector = null) {
-		
+	public function not(\DOMElement|array|string|null $selector = null) : static
+	{
 		if (!isset($selector)) return $this;
 		
 		if (is_string($selector)) {
@@ -961,11 +974,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * End the recent filtering operation in the current chain and return the set
 	 * of matched element to its initial state.
 	 * 
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the current matched elements.</p>
 	 **/
-	public function end() { 
-		
+	public function end() : static
+	{
 		$this->query_result = null; 
 		$this->root = $this[0]->ownerDocument->firstChild; 
 		
@@ -976,15 +989,15 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Get the html of the first element in the set of matched elements or set 
 	 * the html element content of every matched element.
 	 * 
-	 * @param string $html [optional]<p>
+	 * @param ?string $html [optional]<p>
 	 * 		when set, the html content of every matched element will be set to that value.
 	 * 		Otherwise the html content of the first element in the set of matched elements is returned.</p>
-	 * @return HTML <p>
+	 * @return mixed <p>
 	 * 		Returns the html content of the first element in the set of matched elements. 
 	 * 		Otherwise the elements in the set of matched elements which html content is set are returned.</p>
 	 */
-	public function html($html = null) { 
-		
+	public function html(?string $html = null) : mixed
+	{
 		if (!isset($html)) return $this[0]->C14N(); 
 		
 		foreach ($this as $node) {
@@ -1002,11 +1015,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 
 	 * @param string $className <p>
 	 * 		One or more space seperated classes to be added to the class attribute of each matched element.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the set of matched elements.</p>
 	 */
-	public function addClass ($className) {
-		
+	public function addClass (string $className) : static
+	{
 		foreach ($this as $node) {
 			$node = $this->toXDTObject($node);
 			
@@ -1028,11 +1041,11 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * 
 	 * @param string $className <p>
 	 * 		One or more space seperated classes to be removed to the class attribute of each matched element.</p>
-	 * @return XDTNodeList <p>
+	 * @return static <p>
 	 * 		Returns the set of matched elements.</p>
 	 */
-	public function removeClass($className) {
-		
+	public function removeClass(string $className) : static
+	{
 		foreach ($this as $node) {
 			$node = $this->toXDTObject($node);
 			
@@ -1059,9 +1072,10 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess {
 	 * Adds or removes one or more classes from each element in the set of matched elements, depending on eather the class's presence.
 	 * Enter description here ...
 	 * @param string $className
+	 * @return void
 	 */
-	public function toggleClass(string $className) {
-		
+	public function toggleClass(string $className) : void
+	{
 		foreach ($this as $node) {
 			$node = $this->toXDTObject($node);
 			
