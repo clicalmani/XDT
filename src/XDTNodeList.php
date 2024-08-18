@@ -757,6 +757,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	{
 		if (isset($value)) {
 			foreach ($this as $node) $node->nodeValue = $value;
+			return null;
 		} else return $this[0]->nodeValue;
 	}
 	
