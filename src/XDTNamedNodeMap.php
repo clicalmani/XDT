@@ -2,7 +2,7 @@
 namespace Clicalmani\XPower;
 
 /**
- * @package clicalmani/xpower
+ * @package XDT
  * @author @clicalmani
  */
 class XDTDOMNamedNodeMap 
