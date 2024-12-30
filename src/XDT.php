@@ -107,13 +107,13 @@ class XDT
 	 *     XML file to load. The file extension (.xml) is optional.</p>
 	 * @param bool $preserve_white_space [optional] <p>
 	 * 		Do not remove redundant white space. Default to false.</p>
-	 * @param boolean $format_output [optional] <p>
+	 * @param bool $format_output [optional] <p>
 	 * 		Nicely formats output with indentation and extra space. Default to false.</p>
 	 * @return bool <p>
 	 * 		Returns true on success and false on failure.</p>
 	 *     
 	 */
-	public final function connect(string $file_name, bool $preserve_white_space = false, bool $format_output = false) : bool
+	public final function connect(string $file_name, ?bool $preserve_white_space = false, ?bool $format_output = false) : bool
 	{ 
 		
 		if (preg_match('/\.xml$/i', $file_name) == false) {
@@ -140,14 +140,14 @@ class XDT
 	 * 
 	 * @param string $xml <p>
 	 * 		String containing XML structure.</p>
-	 * @param boolean $preserve_white_space [optional] <p>
+	 * @param ?bool $preserve_white_space [optional] <p>
 	 * 		Do not remove redundant white space. Default to false.</p>
-	 * @param bool $format_output [optional] <p>
+	 * @param ?bool $format_output [optional] <p>
 	 * 		Nicely formats output with indentation and extra space. Default to false.</p>
 	 * @return bool <p>
 	 * 		Returns true on success and false on failure.</p>
 	 */
-	public final function load (string $xml, bool $preserve_white_space = false, bool $format_output = false) : bool
+	public final function load (string $xml, ?bool $preserve_white_space = false, ?bool $format_output = false) : bool
 	{
 		
 		$this->document->preserveWhiteSpace = $preserve_white_space;
@@ -223,12 +223,12 @@ class XDT
 	 * Parse a string containing a CSS selector expression, match the selected elements and 
 	 * returns an XDTNodeList object containing the set of matched elements.
 	 *     
-	 * @param string $selector [optional] <p>
+	 * @param ?string $selector [optional] <p>
 	 *     A string containing the selector expression. You can provide multiples selectors 
 	 *     by separating them with a comma (,).</p>
-	 * @param DOMElement $context [optional] <p>
+	 * @param ?\DOMElement $context [optional] <p>
 	 *     DOM element used as the selection context.</p>
-	 * @param int $flag [optional] <p>
+	 * @param ?int $flag [optional] <p>
 	 * 	   Accepted flags are: <br>
 	 *     <ul>
 	 *       <li>XDT_SELECT_DESTROY end the current operation and start over a new operation.</li>
@@ -236,7 +236,7 @@ class XDT
 	 *     </ul>
 	 * @return XDTNodeList
 	 */
-	public final function select(string $selector = '*', \DOMElement $context = null, int $flag = XDT_SELECT_DESTROY) : XDTNodeList
+	public final function select(?string $selector = '*', ?\DOMElement $context = null, ?int $flag = XDT_SELECT_DESTROY) : XDTNodeList
 	{
 		if ($flag === XDT_SELECT_DESTROY) $this->query_result = null;
 		
@@ -316,7 +316,15 @@ class XDT
 		return $this->query_result;
 	}
 	
-	private function multipleSelect (string $selectors, \DOMElement $context = null, int $flag = XDT_SELECT_DESTROY) : XDTNodeList
+	/**
+	 * Select multiple elements.
+	 * 
+	 * @param string $selectors
+	 * @param ?\DOMElement $context
+	 * @param ?int $flag
+	 * @return XDTNodeList
+	 */
+	private function multipleSelect (string $selectors, ?\DOMElement $context = null, ?int $flag = XDT_SELECT_DESTROY) : XDTNodeList
 	{
 		$selectors = preg_split('/[,]/', $selectors, -1, PREG_SPLIT_NO_EMPTY);
 		
@@ -331,6 +339,12 @@ class XDT
 		return $list;
 	}
     
+	/**
+	 * Parse the selector expression.
+	 * 
+	 * @param string $selector
+	 * @return mixed
+	 */
 	private function parseSelector (string $selector) : mixed
 	{
 		$char = substr($selector, 0, 1);
@@ -391,6 +405,12 @@ class XDT
 		return $selector;
 	}
 	
+	/**
+	 * Query the document for elements.
+	 * 
+	 * @param string $selector
+	 * @return XDTNodeList
+	 */
 	private function querySelector (string $selector) : XDTNodeList
 	{
 		$selector = trim($selector);
@@ -432,7 +452,14 @@ class XDT
 		}
 	}
 	
-	private function getElementById (string $selector, string $tag_name = null) : XDTNodeList
+	/**
+	 * Get element by id.
+	 * 
+	 * @param string $selector
+	 * @param ?string $tag_name
+	 * @return XDTNodeList
+	 */
+	private function getElementById (string $selector, ?string $tag_name = null) : XDTNodeList
 	{
 		$l = new XDTNodeList();
 		
@@ -466,7 +493,14 @@ class XDT
 		return $l;
 	}
 	
-	private function getElementsByClass (string $selector, string $tag_name = null) : XDTNodeList
+	/**
+	 * Get elements by class.
+	 * 
+	 * @param string $selector
+	 * @param ?string $tag_name
+	 * @return XDTNodeList
+	 */
+	private function getElementsByClass (string $selector, ?string $tag_name = null) : XDTNodeList
 	{
 		$l = new XDTNodeList(); 
 		
@@ -507,6 +541,12 @@ class XDT
 		else return $this->query_result;
 	}
 	
+	/**
+	 * Get elements by attribute.
+	 * 
+	 * @param string $selector
+	 * @return XDTNodeList
+	 */
 	private function getElementsByAttr (string $selector) : XDTNodeList
 	{ 
 		$matches = array();
@@ -571,6 +611,12 @@ class XDT
 		return $this->query_result;
 	}
 	
+	/**
+	 * Get elements by tag name.
+	 * 
+	 * @param string $tag
+	 * @return XDTNodeList
+	 */
 	private function getElementsByTagName (string $tag) : XDTNodeList
 	{
 		if ($this->query_result == null AND $this->root instanceof \DOMElement) $this->query_result = $this->root->getElementsByTagName('*');
@@ -592,6 +638,11 @@ class XDT
 		return $this->query_result;
 	}
 	
+	/**
+	 * Process selection data.
+	 * 
+	 * @return mixed
+	 */
 	protected function processData(mixed $data) : mixed
 	{
 		if (is_string($data)) {
@@ -610,6 +661,11 @@ class XDT
 		return null;
 	}
 	
+	/**
+	 * Select elements by pseudo.
+	 * 
+	 * @return XDTNodeList
+	 */
 	protected function getElementsByPseudo (string $selector) : mixed
 	{
 		$chuncks = explode(':', $selector);
@@ -696,6 +752,12 @@ class XDT
 		return $this->query_result;
 	}
 	
+	/**
+	 * Create a document fragment from selection data.
+	 * 
+	 * @param string $data
+	 * @return mixed
+	 */
 	private function createDocumentFragmentFromSelection($data) : mixed
 	{
 		$frag = $this->createDocumentFragment();
@@ -743,7 +805,7 @@ class XDT
 	 * 	   XML file version, default value is 1.0 </p>
 	 * @return Boolean True on success, or False on error.
 	 */
-	public function createNewXMLFile ($file_name, $root = '<root></root>', $version = '1.0', $charset = 'UTF-8') {
+	public function createNewXMLFile (?string $file_name, ?string $root = '<root></root>', ?string $version = '1.0', ?string $charset = 'UTF-8') {
 		
 		$file_name = $this->xml_dir->path . DIRECTORY_SEPARATOR . $file_name;
 		
@@ -754,7 +816,19 @@ class XDT
 		return fclose($handle);
 	}
 	
-	public function newFile($file_name, $root = null, $version = '1.0', $charset = 'UTF-8') { $this->createNewXMLFile($file_name, $root, $version, $charset); }
+	/**
+	 * Create a new XML file.
+	 * 
+	 * @param string $file_name
+	 * @param string $root
+	 * @param string $version
+	 * @param string $charset
+	 * @return void
+	 */
+	public function newFile(string $file_name, ?string $root = null, ?string $version = '1.0', ?string $charset = 'UTF-8') 
+	{ 
+		$this->createNewXMLFile($file_name, $root, $version, $charset); 
+	}
 }
 
 

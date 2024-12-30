@@ -39,7 +39,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @param \DOMElement|array<DOMElement> $element
 	 *     DOM element or array of DOM elements can be provided to instanciate the object with.
 	 */
-	public function __construct(DOMElement|array $element = null) 
+	public function __construct(mixed $element = null) 
 	{
 	    if (NULL !== $element) {
 			if ($element instanceof DOMElement) {
@@ -172,7 +172,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return static <p>
 	 * 	   Returns the set of elements that was removed.</p>
 	 */
-	public function replaceWith (XDTNodeList|\DOMElement|string $content) : static
+	public function replaceWith (mixed $content) : static
 	{
 		if ($this->length === 0) return null;
 		
@@ -204,7 +204,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return static <p>
 	 *     Returns the inserted elements on success, for chaining purpose, or &null on failure.</p>
 	 */
-	public function insertBefore (XDTNodeList|\DOMElement|string $target) : static
+	public function insertBefore (mixed $target) : static
 	{
 		if ($target = $this->processData($target)) 
 			foreach ($this as $node) 
@@ -226,7 +226,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return static <p>
 	 *     Returns the inserted elements on success, for chaining purpose, or &null on failure.</p>
 	 */
-	public function insertAfter (XDTNodeList|\DOMElement|string $target) : static
+	public function insertAfter (mixed $target) : static
 	{
 		if ($target = $this->processData($target)) 
 			foreach ($this as $node) 
@@ -300,7 +300,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return static <p>
 	 * 	   Returns the set of inserted elements, for chaining purpose, on success or &null on failure.</p>
 	 */
-	public function appendTo (XDTNodeList|\DOMElement|string|array $target) : static
+	public function appendTo (mixed $target) : static
 	{
 		if ($target = $this->processData($target))
 			foreach ($this as $node) 
@@ -321,7 +321,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return static <p>
 	 *     Returns the set of inserted elements, for chaining purpose, on success or &null on failure.</p>
 	 */
-	public function prependTo (XDTNodeList|\DOMElement|string|array $target) : static
+	public function prependTo (mixed $target) : static
 	{
 		if ($target = $this->processData($target))
 			foreach ($this as $node) 
@@ -342,7 +342,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return static <p>
 	 * 		Returns the set of matched elements for chaining purpose.</p>
 	 */
-	public function wrap(XDTNodeList|\DOMElement|string $selector) : static
+	public function wrap(mixed $selector) : static
 	{
 		if ($selector = $this->processData($selector))
 			foreach ($this as $node) {
@@ -399,7 +399,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return bool <p>
 	 *     Returns TRUE on success, or FALSE on error or failure.
 	 */
-	public function hasChildren(\DOMElement|string|null $selector = null) : bool
+	public function hasChildren(mixed $selector = null) : bool
 	{
 		$ret = $this->children();
 		
@@ -582,7 +582,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 		if (!isset($data)) {
 			
 			$data = $this[0]->attributes;
-			$obj = new XDTDOMNamedNodeMap($data);
+			$obj = new XDTNamedNodeMap($data);
 			
 			for ($i=0; $i<$data->length; $i++) {
 				$obj->{$data->item($i)->name} = $data->item($i)->nodeValue;
@@ -620,7 +620,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * 		The current value of the named attribute of the first matched element when 
 	 *      the method is used to get a value; otherwise the current selection matched elements.</p>
 	 */
-	public function attr(string|array $name, string|array $value = null) : mixed
+	public function attr(string|array $name, mixed $value = null) : mixed
 	{
 		if (!isset($value) AND is_string($name)) {
 			/** @var \DOMNode */
@@ -669,7 +669,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return int <p>
 	 *     Returns the matched element's index on success, or -1 on failure.
 	 */
-	public function index (\DOMElement|string|null $selector = null) : int
+	public function index (mixed $selector = null) : int
 	{
 		if (!isset($selector)) {
 			
@@ -947,7 +947,7 @@ class XDTNodeList extends XDT implements \IteratorAggregate, \ArrayAccess
 	 * @return static <p>
 	 * 		Returns the filtered elements.</p>
 	 */
-	public function not(\DOMElement|array|string|null $selector = null) : static
+	public function not(mixed $selector = null) : static
 	{
 		if (!isset($selector)) return $this;
 		

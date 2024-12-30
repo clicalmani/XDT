@@ -9,6 +9,8 @@ namespace Clicalmani\XPower;
  *
  */
 class XDTIterator implements \Iterator {
+
+	/** Object **/
 	private $obj;
 	
 	/** Iterator index **/

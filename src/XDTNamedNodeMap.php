@@ -5,7 +5,7 @@ namespace Clicalmani\XPower;
  * @package XDT
  * @author @clicalmani
  */
-class XDTDOMNamedNodeMap 
+class XDTNamedNodeMap 
 {
 	private $attributes;
 	public $length;
