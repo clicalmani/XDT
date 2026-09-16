@@ -149,7 +149,7 @@ class XDT
 	 */
 	public final function load (string $xml, ?bool $preserve_white_space = false, ?bool $format_output = false) : bool
 	{
-		$xml = tidy_repair_string($xml, $config = [
+		$xml = \tidy_repair_string($xml, $config = [
 			'indent'         => true,       // Activates indentation
 			'indent-spaces'  => 4,          // Number of spaces for indentation
 			'output-html'    => false,      
@@ -163,7 +163,7 @@ class XDT
 		
 		$this->query_result = null;
 		
-		if ($this->document->loadXML($xml)) {
+		if (@ $this->document->loadXML($xml)) {
 			$this->root = $this->document->childNodes->item(0);
 			
 			return true;
@@ -633,7 +633,7 @@ class XDT
 		
 		$list = new XDTNodeList();
 		
-		foreach ($this->query_result as $node) {
+		foreach ($this->query_result ?? [] as $node) {
 			if (($node->nodeType === 3)) continue;
 			
 			if (strtolower($node->nodeName) === strtolower($tag)) { 
